@@ -1,0 +1,68 @@
+PUT logs-vector
+{
+  "settings": {
+    "index": {
+      "knn": true,
+      "knn.algo_param.ef_search": 100
+    }
+  },
+  "mappings": {
+    "properties": {
+      "id": {
+        "type": "keyword"
+      },
+      "message": {
+        "type": "text"
+      },
+      "timestamp": {
+        "type": "date"
+      },
+      "level": {
+        "type": "keyword"
+      },
+      "service": {
+        "type": "keyword"
+      },
+      "app": {
+        "type": "keyword"
+      },
+      "namespace": {
+        "type": "keyword"
+      },
+      "pod": {
+        "type": "keyword"
+      },
+      "logger": {
+        "type": "keyword"
+      },
+      "thread": {
+        "type": "keyword"
+      },
+      "pid": {
+        "type": "keyword"
+      },
+      "trace_id": {
+        "type": "keyword"
+      },
+      "errorCode": {
+        "type": "keyword"
+      },
+      "userId": {
+        "type": "keyword"
+      },
+      "vector": {
+        "type": "knn_vector",
+        "dimension": 1024,
+        "method": {
+          "name": "hnsw",
+          "space_type": "cosinesimil",
+          "engine": "nmslib"
+        }
+      },
+      "original_data": {
+        "type": "object",
+        "enabled": false
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "level": "ERROR",
+  "pid": "1",
+  "service": "api_gateway_service_spring_boot",
+  "thread": "io-9000-exec-10",
+  "trace_id": "971ece0fc86904ca0c83dde85da21519-d287895a152a6ef9",
+  "logger": "o.s.web.servlet.DispatcherServlet",
+  "message": "Set SecurityContextHolder to anonymous SecurityContext",
+  "time": "2025-05-04T04:48:37.579Z",
+  "detected_level": "ERROR",
+  "app": "api-gateway",
+  "namespace": "default",
+  "pod": "api-gateway-5745c75b4d-mgrpv",
+  "service_name": "api_gateway_service_spring_boot"
+}

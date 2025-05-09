@@ -1,0 +1,15 @@
+{
+  "level": "ERROR",
+  "pid": "1",
+  "service": "api_gateway_service_spring_boot",
+  "thread": "io-9000-exec-12",
+  "trace_id": "f3e1d4ac9b824e1c92afef5b98e67523-abc123456789def0",
+  "logger": "o.s.jdbc.datasource.DataSourceUtils",
+  "message": "Failed to obtain JDBC Connection: org.postgresql.util.PSQLException: Connection to localhost:5432 refused. Check that the hostname and port are correct and that the postmaster is accepting TCP/IP connections.",
+  "time": "2025-05-04T05:12:43.001Z",
+  "detected_level": "ERROR",
+  "app": "api-gateway",
+  "namespace": "default",
+  "pod": "api-gateway-5745c75b4d-mgrpv",
+  "service_name": "api_gateway_service_spring_boot"
+}

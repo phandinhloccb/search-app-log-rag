@@ -1,0 +1,15 @@
+{
+  "level": "ERROR",
+  "pid": "1",
+  "service": "api_gateway_service_spring_boot",
+  "thread": "io-9000-exec-15",
+  "trace_id": "abc123ef4567890fgh-xyz789123456def0",
+  "logger": "com.example.thirdparty.ClientService",
+  "message": "Failed to connect to third-party API: java.net.ConnectException: Connection timed out while attempting to reach on-premises endpoint at 10.0.0.12:8080",
+  "time": "2025-05-04T05:45:18.734Z",
+  "detected_level": "ERROR",
+  "app": "api-gateway",
+  "namespace": "default",
+  "pod": "api-gateway-5745c75b4d-mgrpv",
+  "service_name": "api_gateway_service_spring_boot"
+}
