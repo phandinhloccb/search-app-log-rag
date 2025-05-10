@@ -229,7 +229,10 @@ def get_summary_from_hits(hits, original_query):
     content = "\n\n".join(documents)
 
     try:
-        prompt = f"""You are a DevOps assistant analyzing logs. Based on the following log entries, please provide a concise summary addressing the user query: "{original_query}"
+        prompt = f"""You are a DevOps assistant analyzing logs. Based on the following log entries, please:
+1. Extract information relevant to the user query: "{original_query}"
+2. If you find ERROR logs, highlight the potential issues and their likely causes
+3. Suggest possible solutions if errors are detected
 
 If the logs don't contain information relevant to the query, clearly state that no relevant information was found.
 
@@ -280,29 +283,18 @@ def process_api_request(query):
 def lambda_handler(event, context):
 
     logger.info(json.dumps(event))
-    
-    # if "challenge" in event:
-    #     return event["challenge"]
-    
-    # if not is_verify_token(event):
-    #     return "OK"    
-    
-    # if not is_app_mention(event):
-    #     return "OK"    
-    
+    msg = event['Records'][0]['body']
+    logger.info(f"msg: {msg}")
 
-    
-    # question = event.get("event").get("text")
-    # logger.info(f"Received question: {question}")
-    # user_id = event.get("event").get("user")
-
-    question = event.get("body")
-
+    msg_json = json.loads(msg)
+    logger.info(f"msg_json: {msg_json}")
+    question = msg_json.get("message")
+    user_id = msg_json.get("user_id")
+    channel = msg_json.get("channel")
 
     try:
         result = process_api_request(question)
-        logger.info(f"result: {result}")
-        # post_message_to_channel(event.get("event").get("channel"), result, user_id)
+        post_message_to_channel(channel, result, user_id)
         
         # Return the result
         return {

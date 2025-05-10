@@ -18,10 +18,15 @@ def lambda_handler(event, context):
     
     sgmes = event.get("event").get("text")
     sguser = event.get("event").get("user")
+    channel = event.get("event").get("channel")
 
     sqs = boto3.client('sqs')
-    sqs.send_message(QueueUrl=queue_url, MessageBody=json.dumps({"message": sgmes, "user_id": sguser}))
-    
+    try:
+        sqs.send_message(QueueUrl=queue_url, MessageBody=json.dumps({"message": sgmes, "user_id": sguser, "channel": channel}))
+        logger.info("Message sent to SQS successfully")
+    except Exception as e:
+        logger.error(f"Error sending message to SQS: {str(e)}")
+
     return 'OK'
 
 
