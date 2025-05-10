@@ -6,7 +6,7 @@ from datetime import datetime
 from opensearchpy import OpenSearch, RequestsHttpConnection, AWSV4SignerAuth
 import urllib.request
 
-# Thiết lập logging
+# Logging setup
 import logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -21,7 +21,7 @@ awsauth = AWSV4SignerAuth(credentials, region)
 opensearch_endpoint = os.environ.get("OPENSEARCH_HOST")
 opensearch_index = os.environ.get("OPENSEARCH_INDEX", "logs-vector")
 
-# Khởi tạo OpenSearch client
+# OpenSearch client
 client = OpenSearch(
     hosts=[{"host": opensearch_endpoint, "port": 443}],
     http_auth=awsauth,
@@ -35,7 +35,7 @@ client = OpenSearch(
 bedrock = boto3.client('bedrock-runtime', region_name=region)
 
 
-# Hàm tạo embeddings thay thế BedrockEmbeddings
+# Create embeddings BedrockEmbeddings
 def get_embedding(text, model_id="amazon.titan-embed-text-v2:0"):
     try:
         response = bedrock.invoke_model(
@@ -49,7 +49,7 @@ def get_embedding(text, model_id="amazon.titan-embed-text-v2:0"):
         logger.error(f"Error getting embedding: {str(e)}")
         raise
 
-# Hàm chat thay thế BedrockChat
+# chat BedrockChat
 def generate_response(prompt, model_id="apac.anthropic.claude-3-5-sonnet-20241022-v2:0"):
     try:
         response = bedrock.invoke_model(
@@ -67,7 +67,6 @@ def generate_response(prompt, model_id="apac.anthropic.claude-3-5-sonnet-2024102
         return f"Error generating summary: {str(e)}"
 
 # === Helper functions ===
-
 def extract_date_from_query(query):
     patterns = [
         r"on\s+(\d{1,2}/\d{1,2}/\d{4})",
@@ -124,10 +123,9 @@ def build_text_for_summary(doc):
 
 def vector_search_with_filters(query, k=3):
     try:
-        # Lấy query embedding
         embedding = get_embedding(query)
         
-        # Trích xuất filters
+        # filters extract
         date_str = extract_date_from_query(query)
         log_level = extract_log_level(query)
         error_code = extract_error_code(query)
@@ -135,7 +133,7 @@ def vector_search_with_filters(query, k=3):
         # Log extracted filters
         logger.info(f"Extracted filters - Date: {date_str}, Level: {log_level}, Error Code: {error_code}")
         
-        # Base query với vector search
+        # Base query with vector search
         must_clauses = [{
             "knn": {
                 "vector": {
@@ -156,7 +154,7 @@ def vector_search_with_filters(query, k=3):
                 }
             })
 
-        # Thêm log level filter nếu có
+        # log level filter  
         if log_level:
             must_clauses.append({
                 "match": {
@@ -164,7 +162,7 @@ def vector_search_with_filters(query, k=3):
                 }
             })
             
-        # Thêm error code filter nếu có
+        # error code filter
         if error_code:
             must_clauses.append({
                 "match": {
@@ -172,7 +170,7 @@ def vector_search_with_filters(query, k=3):
                 }
             })
 
-        # Tạo truy vấn
+        # create query
         vector_query = {
             "size": k,
             "query": {
@@ -184,15 +182,15 @@ def vector_search_with_filters(query, k=3):
         
         # logger.info(f"Vector search query: {json.dumps(vector_query)}")
         
-        # Thực hiện tìm kiếm
+        # perform search
         results = client.search(index=opensearch_index, body=vector_query)
         hits = results["hits"]["hits"]
-        # Thêm metadata vào kết quả
+        # add metadata to results
         for hit in hits:
             logger.info(f"hit score: {hit['_score']}")
             hit["_source"]["_score"] = hit["_score"]
         
-        # Lọc kết quả theo ngưỡng điểm
+        # filter results by score threshold
         min_score_threshold = 0.8
         filtered_hits = [hit for hit in hits if hit["_score"] >= min_score_threshold]
 
@@ -200,7 +198,7 @@ def vector_search_with_filters(query, k=3):
         # logger.info(f"Found {len(filtered_hits)} results with scores above {min_score_threshold}")
 
         
-        # Trả về top k kết quả
+        # return top k results
         return filtered_hits[:k]
         
     except Exception as e:
