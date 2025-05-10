@@ -5,11 +5,10 @@ import os
 from datetime import datetime
 from opensearchpy import OpenSearch, RequestsHttpConnection, AWSV4SignerAuth
 import urllib.request
+from aws_lambda_powertools import Logger
 
 # Logging setup
-import logging
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+logger = Logger()
 
 # AWS setup
 region = os.environ.get("AWS_REGION", "ap-northeast-1")

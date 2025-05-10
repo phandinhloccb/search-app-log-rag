@@ -3,6 +3,7 @@ import boto3
 import uuid
 import os
 from opensearchpy import OpenSearch, RequestsHttpConnection, AWSV4SignerAuth
+from aws_lambda_powertools import Logger
 
 # --- Config ---
 region = 'ap-northeast-1'
@@ -13,6 +14,9 @@ auth = AWSV4SignerAuth(credentials, region, service)
 host = os.environ["OPENSEARCH_HOST"]
 port = 443
 INDEX_NAME = 'logs-vector'
+
+# Logging setup
+logger = Logger()
 
 opensearch = OpenSearch(
     hosts=[{'host': host, 'port': port}],
@@ -47,7 +51,7 @@ def process_and_index_log(log_data, doc_id=None):
     
     message = log_data.get('message', '')
     vector = get_embedding_from_message(message)
-    print(f"vector message: {message}")
+    logger.info(f"vector message: {message}")
 
     document = {
         "id": log_data.get('id', doc_id),
@@ -95,7 +99,7 @@ def lambda_handler(event, context):
             })
 
         except Exception as e:
-            print(f"[ERROR] Failed to process {key}: {str(e)}")
+            logger.error(f"[ERROR] Failed to process {key}: {str(e)}")
             return {
                 "statusCode": 500,
                 "body": json.dumps({
