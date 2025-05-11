@@ -79,6 +79,7 @@ def process_and_index_log(log_data, doc_id=None):
 def lambda_handler(event, context):
     s3 = boto3.client('s3')
     results = []
+    logger.info(f"[INFO] Event: {event}")
 
     for record in event['Records']:
         bucket = record['s3']['bucket']['name']
@@ -88,13 +89,13 @@ def lambda_handler(event, context):
             obj = s3.get_object(Bucket=bucket, Key=key)
             content = obj['Body'].read()
             data = json.loads(content)
-
-            doc_id = str(uuid.uuid4())
-            process_and_index_log(data, doc_id)
+            for log in data:
+                logger.info(f"[INFO] Data: {log}")
+                doc_id = str(uuid.uuid4())
+                process_and_index_log(log, doc_id)
 
             results.append({
                 "key": key,
-                "doc_id": doc_id,
                 "status": "indexed"
             })
 

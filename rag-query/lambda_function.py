@@ -193,7 +193,7 @@ def vector_search_with_filters(query, k=3):
         min_score_threshold = 0.8
         filtered_hits = [hit for hit in hits if hit["_score"] >= min_score_threshold]
 
-        # logger.info(f"hits: {hits}")
+        logger.info(f"hits: {hits}")
         # logger.info(f"Found {len(filtered_hits)} results with scores above {min_score_threshold}")
 
         
@@ -203,20 +203,6 @@ def vector_search_with_filters(query, k=3):
     except Exception as e:
         logger.error(f"Error in vector search: {str(e)}")
         raise
-
-def format_hits(hits):
-    formatted = []
-    for hit in hits:
-        source = hit["_source"]
-        timestamp = source.get("timestamp", "N/A")
-        message = source.get("message", "No message")
-        service = source.get("service", source.get("app", "unknown"))
-        level = source.get("level", "unknown")
-        score = source.get("_score", 0)
-        
-        formatted.append(f"[{timestamp}] [{level}] ({service}) {message} [Score: {score:.2f}]")
-    
-    return "\n".join(formatted)
 
 def get_summary_from_hits(hits, original_query):
     if not hits:
@@ -328,20 +314,6 @@ def post_message_to_channel(channel, message, user_id):
             
             # Format the message with proper line breaks
             formatted_message = f"*Summary:*\n{summary}\n\n"
-            
-            if logs:
-                formatted_message += "*Log Entries:*\n"
-                for i, log in enumerate(logs, 1):
-                    # Extract key information
-                    timestamp = log.get("timestamp", "N/A")
-                    log_message = log.get("message", "No message")
-                    service = log.get("service", log.get("app", "unknown"))
-                    level = log.get("level", "unknown")
-                    score = log.get("score", 0)
-                    
-                    formatted_message += f"*{i}. [{timestamp}] [{level}] - {service}*\n"
-                    formatted_message += f"Message: {log_message}\n"
-                    formatted_message += f"Score: {score:.2f}\n\n"
             
             message = formatted_message
         
