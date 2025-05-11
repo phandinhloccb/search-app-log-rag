@@ -178,9 +178,7 @@ def vector_search_with_filters(query, k=3):
                 }
             }
         }
-        
-        # logger.info(f"Vector search query: {json.dumps(vector_query)}")
-        
+
         # perform search
         results = client.search(index=opensearch_index, body=vector_query)
         hits = results["hits"]["hits"]
@@ -190,12 +188,10 @@ def vector_search_with_filters(query, k=3):
             hit["_source"]["_score"] = hit["_score"]
         
         # filter results by score threshold
-        min_score_threshold = 0.8
+        min_score_threshold = 1.5
         filtered_hits = [hit for hit in hits if hit["_score"] >= min_score_threshold]
 
         logger.info(f"hits: {hits}")
-        # logger.info(f"Found {len(filtered_hits)} results with scores above {min_score_threshold}")
-
         
         # return top k results
         return filtered_hits[:k]
